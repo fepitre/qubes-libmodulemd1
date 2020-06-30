@@ -1,0 +1,68 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+# export DH_VERBOSE = 1
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+# ccache hack.
+# meson seems to be using ccache unconditionally and opportunistically, which
+# can be seen controversially in the first place, but also breaks builds in
+# default configurations.
+# Tools like sbuild set ${HOME} to a non-existent directory
+# (/sbuild-nonexistent) since builds are not supposed to touch or even modify
+# files in the home directory anyway.
+# That's fine in general, but given that meson calls ccache if it's available
+# in the build environment, and ccache tries to write files to a location
+# relative to the home directory which doesn't exist, builds fail.
+# Let's work around this issue by specifying a temporary directory within the
+# debian directory if ${CCACHE_DIR} and ${CCACHE_TEMPDIR} are not set.
+# Note that we don't care about the values they are set to because checking for
+# sanity would be too complicated. Garbage in, garbage out.
+ifeq ($(origin CCACHE_DIR),undefined)
+  CCACHE_DIR_OVERRIDE = $(CURDIR)/debian/ccache
+endif
+ifeq ($(origin CCACHE_TEMPDIR),undefined)
+  CCACHE_TEMPDIR_OVERRIDE = $(CURDIR)/debian/ccache/tmp
+endif
+
+%:
+	dh "$@" --buildsystem=meson+ninja --with=gir
+
+override_dh_auto_configure:
+	[ -n '$(CCACHE_DIR_OVERRIDE)' ] && export CCACHE_DIR='$(CCACHE_DIR_OVERRIDE)'; \
+	[ -n '$(CCACHE_TEMPDIR_OVERRIDE)' ] && export CCACHE_TEMPDIR='$(CCACHE_TEMPDIR_OVERRIDE)'; \
+	dh_auto_configure --builddirectory=build -- --default-library both -Ddeveloper_build=false \
+                                                    -Dtest_dirty_git=false -Dtest_installed_lib=false \
+                                                    -Dskip_introspection=false
+
+override_dh_auto_build:
+	[ -n '$(CCACHE_DIR_OVERRIDE)' ] && export CCACHE_DIR='$(CCACHE_DIR_OVERRIDE)'; \
+	[ -n '$(CCACHE_TEMPDIR_OVERRIDE)' ] && export CCACHE_TEMPDIR='$(CCACHE_TEMPDIR_OVERRIDE)'; \
+	dh_auto_build --builddirectory=build -- all
+
+override_dh_auto_install:
+	[ -n '$(CCACHE_DIR_OVERRIDE)' ] && export CCACHE_DIR='$(CCACHE_DIR_OVERRIDE)'; \
+	[ -n '$(CCACHE_TEMPDIR_OVERRIDE)' ] && export CCACHE_TEMPDIR='$(CCACHE_TEMPDIR_OVERRIDE)'; \
+	dh_auto_install --builddirectory=build
+
+override_dh_auto_clean:
+	rm -fv 'make_srpm.sh' 'make_rpms.sh'
+	rm -fv 'modulemd/config.h' 'modulemd/version.xml'
+	rm -rfv '$(CURDIR)/debian/ccache'
+	dh_auto_clean --builddirectory=build
+
+override_dh_auto_test:
+	dh_auto_test --builddirectory=build
+
+override_dh_missing:
+	dh_missing --fail-missing
+
+override_dh_install:
+	if dpkg --compare-versions "$$(dpkg-query -f='$${Version}' --show 'debhelper')" 'ge' '12'; then \
+		dh_install; \
+	else \
+		dh_install --fail-missing ; \
+	fi

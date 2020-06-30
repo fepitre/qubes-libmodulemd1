@@ -1,0 +1,3 @@
+# Debian pretends specific files (like COPYING) don't exist, but I don't want
+# to.
+modulemd1: unused-file-paragraph-in-dep5-copyright

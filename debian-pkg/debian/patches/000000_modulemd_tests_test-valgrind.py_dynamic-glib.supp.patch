@@ -1,0 +1,27 @@
+Description: Only use glib.supp with glib >= 2.51.1.
+Author: Mihai Moldovan <ionic@ionic.de>
+
+--- a/modulemd/tests/test-valgrind.py
++++ b/modulemd/tests/test-valgrind.py
+@@ -36,11 +36,20 @@ else:
+ 
+ with tempfile.TemporaryDirectory(prefix="libmodulemd_valgrind_") as tmpdirname:
+     def exec_valgrind(test):
++        proc_glib_version_test = subprocess.run(
++            [
++                'pkg-config',
++                '--atleast-version=2.51.1',
++                'glib-2.0'])
++
+         valgrind_command = "/usr/bin/valgrind " \
+                            "--leak-check=full " \
+-                           "--suppressions=/usr/share/glib-2.0/valgrind/glib.supp " \
+                            "--xml=yes " \
+                            "--xml-file=%s/%s.xml " % (tmpdirname, test)
++
++        if not bool(proc_glib_version_test.returncode):
++            valgrind_command += "--suppressions=/usr/share/glib-2.0/valgrind/glib.supp"
++
+         proc_result = subprocess.run(
+             [
+                 'meson',
