@@ -1,0 +1,3 @@
+pkgs/
+*.tar.xz
+debian-pkg/debian/changelog.*

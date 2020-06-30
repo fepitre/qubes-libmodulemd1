@@ -1,0 +1,2 @@
+000000_modulemd_tests_test-valgrind.py_dynamic-glib.supp.patch
+000100_modulemd_meson.build_disable-debug-output-during-tests.patch

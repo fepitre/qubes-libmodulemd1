@@ -1,0 +1,17 @@
+Description: Disable debug output while running tests.
+
+It's just way too noisy and mostly unhelpful.
+
+Author: Mihai Moldovan <ionic@ionic.de>
+
+--- a/modulemd/meson.build
++++ b/modulemd/meson.build
+@@ -187,7 +187,7 @@ install_headers(
+ 
+ # Test env with release values
+ test_release_env = environment()
+-test_release_env.set('G_MESSAGES_DEBUG', 'all')
++#test_release_env.set('G_MESSAGES_DEBUG', 'all')
+ test_release_env.set ('MESON_SOURCE_ROOT', meson.source_root())
+ 
+ 

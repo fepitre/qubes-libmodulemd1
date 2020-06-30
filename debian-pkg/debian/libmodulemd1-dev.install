@@ -1,0 +1,5 @@
+usr/include/modulemd/
+usr/lib/*/libmodulemd.a
+usr/lib/*/libmodulemd.so
+usr/lib/*/pkgconfig/modulemd.pc
+usr/share/gir-1.0/Modulemd-1.0.gir

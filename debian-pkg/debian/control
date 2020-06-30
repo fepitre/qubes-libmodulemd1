@@ -1,0 +1,84 @@
+Source: modulemd1
+Section: libs
+Priority: optional
+Maintainer: Mihai Moldovan <ionic@ionic.de>
+Uploaders: Frédéric Pierret <frederic.pierret@qubes-os.org>
+Build-Depends: debhelper (>= 12~),
+ python3-dev,
+ libpython3-dev,
+ meson (>= 0.47.0~),
+ pkg-config,
+ libglib2.0-dev,
+ libglib2.0-doc,
+ libyaml-dev,
+ gtk-doc-tools,
+ valgrind,
+ python3-pycodestyle,
+ gobject-introspection (>> 1.50.0-1~),
+ libgirepository1.0-dev (>> 1.50.0-1~),
+Standards-Version: 4.4.0.1
+Homepage: https://github.com/fedora-modularity/libmodulemd
+Vcs-Browser: https://github.com/fedora-modularity/libmodulemd
+Vcs-Git: https://github.com/fedora-modularity/libmodulemd.git
+#Testsuite: autopkgtest-pkg-python
+
+Package: libmodulemd1-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+# Will be needed as soon as we also package libmodulemd2.
+# Conflicts: libmodulemd-dev
+Depends: ${misc:Depends},
+ libmodulemd1 (= ${binary:Version}),
+ gir1.2-modulemd-1.0 (= ${binary:Version}),
+ pkg-config,
+ libglib2.0-dev,
+ libyaml-dev,
+ gobject-introspection (>> 1.50.0-1~),
+ libgirepository1.0-dev (>> 1.50.0-1~),
+Suggests: libmodulemd1-doc
+Description: module metadata manipulation library - development files
+ A C library for manipulating module metadata files.
+ .
+ This package contains the development header and static library files for the
+ libmodulemd1 library.
+
+Package: libmodulemd1
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends},
+Recommends: libmodulemd1-bin
+Description: module metadata manipulation library - shared library
+ A C library for manipulating module metadata files.
+ .
+ This package provides the libmodulemd1 shared library.
+
+Package: libmodulemd1-bin
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}, ${misc:Depends},
+Description: module metadata manipulation library - programs
+ A C library for manipulating module metadata files.
+ .
+ This package provides utility programs for the libmodulemd1 shared library.
+
+Package: libmodulemd1-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: ${misc:Depends},
+Description: module metadata manipulation library (common documentation)
+ A C library for manipulating module metadata files.
+ .
+ This package installs common documentation for the libmodulemd1
+ C bindings.
+
+Package: gir1.2-modulemd-1.0
+Section: introspection
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${gir:Depends},
+Description: module metadata manipulation library (GObject introspection data)
+ A C library for manipulating module metadata files.
+ .
+ This package contains introspection data for the GObject bindings library.
